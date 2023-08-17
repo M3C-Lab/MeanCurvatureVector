@@ -7,7 +7,7 @@ msh = load_gmsh2('Sphere.msh');
 Elem_degree = 1;
 % The degree of the element.
 
-gamma = 0.0001;
+gamma = 0.000;
 
 IEN_v = get_IEN_v(msh, Elem_degree); 
 % The IEN of volume-element.
@@ -79,11 +79,14 @@ hh = 0.0;
 %Assembly.
 tic;
 
+node_element_number = zeros(nNode, 1);
+
 for ee = 1 : n_Elem
     node_ele = zeros(3, n_EN);
     for jj = 1 : n_EN
         node_ele(:, jj) = ...
             [msh.POS(IEN_s(jj, ee), 1), msh.POS(IEN_s(jj, ee), 2), msh.POS(IEN_s(jj, ee), 3)]';
+        node_element_number(IEN_s(jj, ee), 1) = node_element_number(IEN_s(jj, ee), 1) + 1;
     end
     
     % For the edge stablization we have to calculate mesh size in advance.
@@ -124,7 +127,7 @@ for ee = 1 : n_Elem
                                                        0,  0, Na];
 
             % (For mean curvature vector)
-            Na_vec = [TriBasis(Elem_degree, aa, 1, 0, tqp(:,qua));
+            Na_xi_vec = [TriBasis(Elem_degree, aa, 1, 0, tqp(:,qua));
                      TriBasis(Elem_degree, aa, 0, 1, tqp(:,qua))];
             for mm = 1 : 3
                 vec1 = zeros(3, 1);
@@ -132,7 +135,7 @@ for ee = 1 : n_Elem
                 Xm_vec = F_hat(mm, :)';
                 for nn = 1 : 3
                     Xn_vec = F_hat(nn, :);
-                    vec1(nn, 1) = Xn_vec / G_FFF * Na_vec;
+                    vec1(nn, 1) = Xn_vec / G_FFF * Na_xi_vec;
                     vec2(nn, 1) = Xn_vec / G_FFF * Xm_vec;
                 end
                 Sx_qua(3 * aa - 3 + mm, 1) = dot(vec1, vec2);
@@ -287,10 +290,12 @@ end
 X = zeros(nNode, 1);
 Y = zeros(nNode, 1);
 Z = zeros(nNode, 1);
+NORM = zeros(nNode, 1);
 for jj = 1 : nNode
     X(jj) = msh.POS(Nodes(jj), 1);
     Y(jj) = msh.POS(Nodes(jj), 2);
     Z(jj) = msh.POS(Nodes(jj), 3);
+    NORM(jj) = norm(nh_result(:, jj));
 end
 U = nh_result(1, :)';
 V = nh_result(2, :)';
@@ -304,6 +309,10 @@ quiver3(X, Y, Z, U, V, W);
 
 hold on;
 plot(MESH);
+
+figure(2);
+scatter3(X,Y,Z, 100, NORM, 'filled');
+colorbar;
 
 % Print the norm of each vector.
 % Record the minimum and maximum norm.

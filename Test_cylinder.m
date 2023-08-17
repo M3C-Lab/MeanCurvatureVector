@@ -1,7 +1,7 @@
 clc;clear all;close all;
 % Here is a test for the potential influcence of the number of triangles
 % surrounding a node.
-addpath("Assembly&Quadrature","CalculateMeshSize", "Preprocess");
+addpath("Assembly&Quadrature","CalculateMeshSize", "Preprocess", "ForTest");
 
 msh = load_gmsh2('Cylinder.msh');
 
