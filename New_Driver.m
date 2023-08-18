@@ -73,6 +73,7 @@ M = zeros(n_eq, n_eq);
 
 b = zeros(n_eq, 1);
 
+% Record the 1-ring element number of the node (for 1st order element).
 node_element_number = zeros(nNode, 1);
 
 for ee = 1 : n_Elem
@@ -130,8 +131,8 @@ for ii = 1 : 3
 end
 
 node_proj = cell(nNode, 1);
+I = eye(3);
 for nn = 1 : nNode
-    I = eye(3);
     tensor_nn = nh_normal_result(:, nn) * nh_normal_result(:, nn)';
     node_proj{nn, 1} = I - tensor_nn;
 end
@@ -181,13 +182,23 @@ for ee = 1 : n_Elem
         Sx_qua = zeros(3 * n_EN, 1);
 
         if Elem_degree == 1
+            normal_qua = zeros(3, 1);
             dx_proj = zeros(3, 3);
             % Approximate dx / dx Projection
 
             for aa = 1 : n_EN
+                normal_qua = normal_qua + nh_normal_result(:, IEN_s(aa, ee)) * ...
+                    TriBasis(Elem_degree, aa, 0, 0, tqp(:,qua));
                 dx_proj = dx_proj + node_proj{IEN_s(aa, ee), 1} * ...
                     TriBasis(Elem_degree, aa, 0, 0, tqp(:,qua));
             end
+            dx_proj2 = I - normal_qua * normal_qua';
+            % dx_proj: Calculate dx/dx projection on the nodes with nodal
+            % normal, then approximate the dx/dx projection at the quadrature
+            % point
+
+            % dx_proj2: Approximate the normal at the quadrature point,
+            % then calculate the dx/dx projection with it.
         end
 
         for aa = 1 : n_EN           
@@ -209,7 +220,8 @@ for ee = 1 : n_Elem
                     if Elem_degree ~= 1
                         vec2(nn, 1) = Xn_vec / G_FFF * Xm_vec;
                     else
-                        vec2(nn, 1) = dx_proj(mm, nn);
+                        % vec2(nn, 1) = dx_proj(mm, nn);
+                        vec2(nn, 1) = dx_proj2(mm, nn);
                     end
                 end
                 Sx_qua(3 * aa - 3 + mm, 1) = dot(vec1, vec2);

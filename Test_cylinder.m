@@ -5,7 +5,7 @@ addpath("Assembly&Quadrature","CalculateMeshSize", "Preprocess", "ForTest");
 
 msh = load_gmsh2('Cylinder.msh');
 
-Elem_degree = 1;
+Elem_degree = 2;
 % The degree of the element.
 
 IEN_v = get_IEN_v(msh, Elem_degree); 
@@ -31,7 +31,7 @@ mcn_inlet = normal_inlet;
 mcn_outlet = normal_outlet;
 
 node_area = zeros(nNode, 3);
-% Here node_area records the surroundding (1-ring) triangles:
+% Here node_area records the surrounding (1-ring) triangles:
 % node_area(ii, *): The ii-th node.
 % node_area(ii, 1): The total area of surrounding triangles.
 % node_area(ii, 2): The total number of surrounding triangles.

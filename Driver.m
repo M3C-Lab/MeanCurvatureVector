@@ -7,7 +7,7 @@ msh = load_gmsh2('Sphere.msh');
 Elem_degree = 1;
 % The degree of the element.
 
-gamma = 0.000;
+gamma = 0.0001;
 
 IEN_v = get_IEN_v(msh, Elem_degree); 
 % The IEN of volume-element.
@@ -79,6 +79,7 @@ hh = 0.0;
 %Assembly.
 tic;
 
+% Record the 1-ring element number of the node (for 1st order element).
 node_element_number = zeros(nNode, 1);
 
 for ee = 1 : n_Elem
