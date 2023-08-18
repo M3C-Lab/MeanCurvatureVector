@@ -13,10 +13,10 @@ n_EN = 3;
 
 [tqp, wtqp, ntqp] = TriQuad(6);
 
-n_Elem = 9;
+n_Elem = 5;
 
 phi = 2 * pi / n_Elem;
-Radius = 0.01;
+Radius = 0.001;
 
 nNode = n_Elem + 1;
 POS = zeros(3, nNode);
@@ -108,14 +108,14 @@ for ee = 1 : n_Elem
         M_ele = M_ele + Jacobian * wtqp(qua) * (Phi_matrix' * Phi_matrix);
 
         % Sf_ele = Sf_ele + Jacobian * wtqp(qua) * Sf_qua;
-        % Real 1st order derivative.
+        % Approach 1: Real 1st order derivative.
         
-        %Sf_ele = Sf_ele + Jacobian * wtqp(qua) * (Phi_x_matrix' * Phi_x_matrix) * f_ele;
-        % Approximated 1st order derivative.
+        Sf_ele = Sf_ele + Jacobian * wtqp(qua) * (Phi_x_matrix' * Phi_x_matrix) * f_ele;
+        % Approach 2: Approximated 1st order derivative with value of f.
 
-        f_x_qua = f_x_ele * tqp(:, qua);
-        Sf_ele = Sf_ele + Jacobian * wtqp(qua) * Phi_x_matrix' * f_x_qua;
-        % Approximated 2.
+        %f_x_qua = f_x_ele * tqp(:, qua);
+        %Sf_ele = Sf_ele + Jacobian * wtqp(qua) * Phi_x_matrix' * f_x_qua;
+        % Approach 3: Another approximated derivative with value of f_x.
     end
 
     for aa = 1 : n_EN
