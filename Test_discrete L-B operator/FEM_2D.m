@@ -50,9 +50,11 @@ Sf = zeros(n_eq, 1);
 for ee = 1 : n_Elem
     node_ele = zeros(2, n_EN);
     f_ele = zeros(3, n_EN);
+    f_x_ele = zeros(2, n_EN);
     for aa = 1 : n_EN
         node_ele(:, aa) = POS(:, IEN_s(aa, ee));
         f_ele(aa, 1) = f(node_ele(1, aa), node_ele(2, aa));
+        f_x_ele(:, aa) = f_x(node_ele(1, aa), node_ele(2, aa));
     end
 
     M_ele = zeros(n_EN, n_EN);
@@ -89,9 +91,13 @@ for ee = 1 : n_Elem
 
         % Sf_ele = Sf_ele + Jacobian * wtqp(qua) * (Phi_x_matrix' * f_x_qua);
         % Real 1st order derivative.
-
-        Sf_ele = Sf_ele + Jacobian * wtqp(qua) * (Phi_x_matrix' * Phi_x_matrix) * f_ele;
+    
+        %Sf_ele = Sf_ele + Jacobian * wtqp(qua) * (Phi_x_matrix' * Phi_x_matrix) * f_ele;
         % Approximated 1st order derivative.
+
+        f_x_qua = f_x_ele * tqp(:, qua);
+        Sf_ele = Sf_ele + Jacobian * wtqp(qua) * Phi_x_matrix' * f_x_qua;
+        % Approximated 2.
     end
 
     for aa = 1 : n_EN

@@ -7,7 +7,7 @@ msh = load_gmsh2('Sphere.msh');
 Elem_degree = 1;
 % The degree of the element.
 
-gamma = 0.0001;
+gamma = 0;
 
 IEN_v = get_IEN_v(msh, Elem_degree); 
 % The IEN of volume-element.
@@ -313,7 +313,10 @@ plot(MESH);
 
 figure(2);
 scatter3(X,Y,Z, 100, NORM, 'filled');
-colorbar;
+ch = colorbar;
+colormap(jet);
+ch.FontSize = 14;
+set(get(ch,'title'), 'string','Norm','Fontsize',14);
 
 % Print the norm of each vector.
 % Record the minimum and maximum norm.

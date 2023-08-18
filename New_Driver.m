@@ -4,7 +4,7 @@ addpath("Assembly&Quadrature","CalculateMeshSize", "Preprocess");
 
 msh = load_gmsh2('Sphere.msh');
 
-Elem_degree = 1;
+Elem_degree = 2;
 % The degree of the element.
 
 gamma = 0;
@@ -69,7 +69,7 @@ if Elem_degree == 1
     hh = 0.0;
 end
 
-M = zeros(n_eq, n_eq);
+M = sparse(n_eq, n_eq);
 
 b = zeros(n_eq, 1);
 
@@ -137,7 +137,7 @@ for nn = 1 : nNode
     node_proj{nn, 1} = I - tensor_nn;
 end
 
-M = zeros(n_eq, n_eq);
+M = sparse(n_eq, n_eq);
 
 Sx = zeros(n_eq, 1);
 
@@ -396,7 +396,10 @@ plot(MESH);
 
 figure(2);
 scatter3(X,Y,Z, 100, NORM, 'filled');
-colorbar;
+ch = colorbar;
+colormap(jet);
+ch.FontSize = 14;
+set(get(ch,'title'), 'string','Norm','Fontsize',14);
 
 % Print the norm of each vector.
 % Record the minimum and maximum norm.
